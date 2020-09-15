@@ -43,7 +43,7 @@ KernelSem:: ~KernelSem(){
 
 /**
  * Block thread for maxTimeToWait*55ms (if arg>0) or while val<0 (if arg==0)
- * Returns maxTimeToWait
+ * Returns 0 if thread is woke beacuse of tick, 1 in other cases
  */
 int KernelSem::wait(Time maxTimeToWait){
 	if(maxTimeToWait > 0){ //block thread for maxTimeToWait*55ms
