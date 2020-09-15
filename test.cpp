@@ -1,23 +1,28 @@
-/*
- * test1.cpp
- *
- *  Created on: May 15, 2019
- *      Author: OS1
- */
-
 #include "system.h"
+#include <iostream.h>
+#include <stdlib.h>
 #include <stdio.h>
 #include "lock.h"
+#include "semaphor.h"
 
 /*
-	Test: cekanje niti
+ 	 Test: Semafori sa spavanjem 4
 */
+
+int t=0;
+
+const int n=15;
+
+Semaphore s(1);
 
 class TestThread : public Thread
 {
+private:
+	Time waitTime;
+
 public:
 
-	TestThread(): Thread() {};
+	TestThread(Time WT): Thread(), waitTime(WT){}
 	~TestThread()
 	{
 		waitToComplete();
@@ -31,85 +36,45 @@ protected:
 void TestThread::run()
 {
 	lock();
-	printf("Thread %d: loop1 starts\n", getId());
+	printf("Thread %d waits for %d units of time.\n",getId(),waitTime);
 	unlock();
-
-	for(int i=0;i<32000;i++)
-	{
-		for (int j = 0; j < 32000; j++);
-	}
-
+	int r = s.wait(waitTime);
+	if(getId()%2)
+		s.signal();
 	lock();
-	printf("Thread %d: loop1 ends, dispatch\n",getId());
+	printf("Thread %d finished: r = %d\n", getId(),r);
 	unlock();
-
-	System::dispatch();
-
-	lock();
-	printf("Thread %d: loop2 starts\n",getId());
-	unlock();
-
-	for (int k = 0; k < 20000; k++);
-
-	lock();
-	printf("Thread %d: loop2 ends\n",getId());
-	unlock();
-
 }
 
-class WaitThread: public Thread
+void tick()
 {
-private:
-	TestThread *t1_,*t2_;
+	t++;
+		lock();
+		printf("%d\n",t);
+		unlock();
+}
 
-public:
-	WaitThread(TestThread *t1, TestThread *t2): Thread()
+int userMain(int argc, char** argv)
+{
+	lock();
+	printf("Test starts.\n");
+	unlock();
+	TestThread* t[n];
+	int i;
+	for(i=0;i<n;i++)
 	{
-		t1_ = t1;
-		t2_ = t2;
-	};
-
-	~WaitThread()
-		{
-			waitToComplete();
-		}
-
-protected:
-
-	void run();
-};
-
-void WaitThread::run(){
-		lock();
-		printf("Starting tests...\n");
-		unlock();
-
-		t1_->waitToComplete();
-		lock();
-		printf("Test 1 completed!\n");
-		unlock();
-
-		t2_->waitToComplete();
-		lock();
-		printf("Test 2 completed!\n");
-		unlock();
+		t[i] = new TestThread(5*(i+1));
+		t[i]->start();
 	}
-
-void tick() {}
-
-int userMain(int argc, char** argv) {
+	for(i=0;i<n;i++)
+	{
+		t[i]->waitToComplete();
+	}
+	delete t;
 	lock();
-	printf("User main starts\n");
+	printf("Test ends.\n");
 	unlock();
-	TestThread t1,t2;
-	WaitThread w(&t1,&t2);
-	t1.start();
-	t2.start();
-	w.start();
-	lock();
-	printf("User main ends\n");
-	unlock();
-	return 16;
+	return 0;
 }
 
 

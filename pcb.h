@@ -22,11 +22,14 @@ public:
 	//geters
 	ID getThreadId();
 	States getState();
-	Time getPassedTime();
 	Thread* getMyThread();
+	Time getQuantum();
+	Time getWaitingQuantum();
 
 	//seters
 	void setState(States s);
+	void setWaitingQuantum(Time maxTimeToWait);
+	void decrementWaitingQuantum();
 
 	~PCB();
 
@@ -45,7 +48,9 @@ private:
 	States state;
 	ID threadId;
 	Thread *myThread;
-	Time quantum; //time slice
+	Time quantum; //time slice for executing
+
+	Time waitingQuantum; //time slice for wait method at semaphore
 
 	Queue *threadsWaitingForMe; // threads that called waitToComplete over this thread
 

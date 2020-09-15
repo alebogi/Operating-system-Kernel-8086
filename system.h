@@ -9,12 +9,18 @@
 #define SYSTEM_H_
 
 /**
- * Class that does initialisation at begining of the program.
+ * Class that does initialisation at begining of the program, restore at the end of program,
+ * where interrupt routine is defined.
  */
 
 #include "thread.h"
 #include "pcb.h"
 #include "queue.h"
+#include "list.h"
+#include "kerSem.h"
+#include "semaphor.h"
+
+class List;
 
 class System{
 public:
@@ -27,6 +33,8 @@ public:
 	static IdleThread* idleThread;
 
 	static Queue* allThreadsPCBs;
+
+	static List* allSemsInSystem;
 
 	static volatile int timeCnt;
 
@@ -42,6 +50,9 @@ protected:
 	friend class PCB;
 	friend class Queue;
 	friend class IdleThread;
+	friend class KernelSem;
+	friend class List;
+	friend class Semaphore;
 private:
 
 };

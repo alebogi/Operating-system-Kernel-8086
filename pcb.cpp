@@ -117,8 +117,28 @@ Thread* PCB::getMyThread(){
 	return myThread;
 }
 
+Time PCB::getQuantum(){
+	return quantum;
+}
+
+Time PCB::getWaitingQuantum(){
+	return waitingQuantum;
+}
+
 void PCB::setState(States s){
 	state = s;
+}
+
+void PCB::setWaitingQuantum(Time maxTimeToWait){
+	lock();
+	waitingQuantum = maxTimeToWait;
+	unlock();
+}
+
+void PCB::decrementWaitingQuantum(){
+	lock();
+	waitingQuantum = waitingQuantum - 1;
+	unlock();
 }
 
 /**

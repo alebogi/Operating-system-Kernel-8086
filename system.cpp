@@ -13,6 +13,8 @@
 #include <dos.h>
 #include <iostream.h>
 #include "lock.h"
+#include "list.h"
+#include "kerSem.h"
 
 //globals
 unsigned int oldTimerOFF, oldTimerSEG;
@@ -32,6 +34,7 @@ volatile PCB* System::runningPCB = 0;
 IdleThread* System::idleThread = 0;
 Queue* System::allThreadsPCBs = 0;
 volatile int System::timeCnt = 5;
+List* System::allSemsInSystem = 0;
 
 int System::lck = 0;
 
@@ -76,6 +79,7 @@ void System::init(){
 #endif
 
 	allThreadsPCBs = new Queue();
+	//allSemsInSystem = new List();
 	//creating thread for main
 	startingThread = new Thread(maxStackSize, 1); //id==-1
 	startingThread->myPCB->setState(PCB::RUNNING);
@@ -118,7 +122,6 @@ void System::restore(){
 	}
 #endif
 	//clearing memory
-	cout << "RESTORE";
 	delete allThreadsPCBs;
 	delete idleThread;
 	delete startingThread; delete startingPCB;
@@ -139,6 +142,7 @@ void interrupt System::timer(){
 		if(timeCnt < 0) timeCnt = 0;
 		tick();
 		realInterrupt = 1;
+		KernelSem::signalTick();
 	}
 
 	//running threads execute time with quantum==0 is unlimited
@@ -169,7 +173,8 @@ void interrupt System::timer(){
 				//cout << "push u SCHEDULER-" << runningThread->getId() << endl;
 				//unlock();
 			}else{
-				if(runningThread->myPCB->getState() != PCB::FINISHED)
+				if((runningThread->myPCB->getState() != PCB::FINISHED) &&
+						(runningThread->myPCB->getState() != PCB::BLOCKED))//???
 					runningThread->myPCB->setState(PCB::READY);
 			}
 
@@ -220,9 +225,9 @@ void interrupt System::timer(){
 }
 
 void System::dispatch(){
-
+	lock();
 	context_switch_on_demand = 1;
-
+	unlock();
 #ifndef BCC_BLOCK_IGNORE
 		asm int 8h
 #endif

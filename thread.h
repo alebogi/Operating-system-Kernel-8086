@@ -30,6 +30,7 @@ protected:
 	friend class PCB;
 	friend class System;
 	friend class IdleThread;
+	friend class KernelSem;
 	Thread (StackSize stackSize = defaultStackSize, Time timeSlice = defaultTimeSlice);
 	virtual void run() {}
 
