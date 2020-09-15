@@ -47,7 +47,14 @@ KernelSem:: ~KernelSem(){
  */
 int KernelSem::wait(Time maxTimeToWait){
 	if(maxTimeToWait > 0){ //block thread for maxTimeToWait*55ms
-		return waitWithTime(maxTimeToWait); //ret 0
+		int ret = 0;
+		ret = waitWithTime(maxTimeToWait); //ret 0 if timeSlice == 0
+		if (ret == 0){
+			return 0;
+		}else{
+			//its signal(n), n>0 that woke thread
+			return 1;
+		}
 	}else if (maxTimeToWait == 0){ //standard wait
 		lock();
 		value = value - 1;
@@ -75,7 +82,8 @@ int KernelSem::waitWithTime(Time maxTimeToWait){
 
 	System::dispatch();
 
-	return 0;
+	//returns how much time has left, to see if it is signal that woke this thread or tick
+	return System::runningThread->myPCB->getWaitingQuantum();
 }
 
 /**

@@ -2,18 +2,16 @@
 #include <iostream.h>
 #include <stdlib.h>
 #include <stdio.h>
-#include "lock.h"
 #include "semaphor.h"
+#include "lock.h"
 
 /*
- 	 Test: Semafori sa spavanjem 4
+ 	 Test: Semafori sa spavanjem 2
 */
 
 int t=0;
 
-const int n=15;
-
-Semaphore s(1);
+Semaphore s(0);
 
 class TestThread : public Thread
 {
@@ -39,19 +37,17 @@ void TestThread::run()
 	printf("Thread %d waits for %d units of time.\n",getId(),waitTime);
 	unlock();
 	int r = s.wait(waitTime);
-	if(getId()%2)
-		s.signal();
+	//s.signal();
 	lock();
 	printf("Thread %d finished: r = %d\n", getId(),r);
 	unlock();
 }
 
-void tick()
-{
+void tick(){
 	t++;
-		lock();
-		printf("%d\n",t);
-		unlock();
+	lock();
+	printf("%d\n",t);
+	unlock();
 }
 
 int userMain(int argc, char** argv)
@@ -59,22 +55,20 @@ int userMain(int argc, char** argv)
 	lock();
 	printf("Test starts.\n");
 	unlock();
-	TestThread* t[n];
-	int i;
-	for(i=0;i<n;i++)
-	{
-		t[i] = new TestThread(5*(i+1));
-		t[i]->start();
-	}
-	for(i=0;i<n;i++)
-	{
-		t[i]->waitToComplete();
-	}
-	delete t;
+	TestThread t1(15),t2(10),t3(30);
+	t1.start();
+	t2.start();
+	t3.start();
+	s.wait(5);
+	int ret = s.signal(2);
+	/*s.wait(0);
+	s.signal();*/
+	t1.waitToComplete(); t2.waitToComplete(); t3.waitToComplete();
 	lock();
-	printf("Test ends.\n");
+	printf("Test ends, return value = %d\n", ret);
 	unlock();
 	return 0;
 }
+
 
 
