@@ -23,7 +23,7 @@ typedef void interrupt (*pInterruptR)(...);
 	void interrupt inter##numEntry(...){\
 		ivte##numEntry.signal();\
 		if (flag == 1)\
-			ivte##numEntry.callOld();\
+			ivte##numEntry.oldRoutine();\
 	}
 
 
@@ -34,6 +34,7 @@ public:
 
 	void signal();
 	void callOld();
+	pInterruptR oldRoutine; //stored old interrupt routine
 
 	static IVTEntry* IVT[256];
 	static IVTEntry* getEntry(IVTNo i);
@@ -41,7 +42,7 @@ protected:
 	friend class KernelEv;
 private:
 	IVTNo entryIvtNo;
-	pInterruptR oldRoutine; //stored old interrupt routine
+	//pInterruptR oldRoutine; //stored old interrupt routine
 };
 
 

@@ -13,6 +13,7 @@
 IVTEntry* IVTEntry::IVT[256] = { 0 };
 
 IVTEntry::IVTEntry(IVTNo no, pInterruptR newRoutine){
+	oldRoutine = 0;
 	entryIvtNo = no;
 	if ((entryIvtNo >= 0) && (entryIvtNo <= 255)) {
 		IVT[entryIvtNo] = this;

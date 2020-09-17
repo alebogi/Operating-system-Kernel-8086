@@ -40,16 +40,17 @@ void  KernelEv::wait(){
 		return;
 	}
 	lock();
-	if(value == 0){
+	if(ownerBlocked == 0){ //value==0
 		ownerBlocked = 1;
 		owner->setState(PCB::BLOCKED);
 		unlock();
 		System::dispatch();
-	}else if(value == 1){
-		value = 0;
-		unlock();
-	}
-
+		return;
+	}//else{
+		//value = 0;
+		//unlock();
+	//}
+	unlock();
 }
 
 void KernelEv::signal(){
@@ -58,9 +59,13 @@ void KernelEv::signal(){
 		owner->setState(PCB::READY);
 		Scheduler::put(owner);
 		ownerBlocked = 0;
-	}else{
-		value = 1;
-	}
+		unlock();
+		System::dispatch();
+		return;
+	}//else{
+		//value = 1;
+		//unlock();
+	//}
 	unlock();
 }
 
