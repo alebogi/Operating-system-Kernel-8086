@@ -70,7 +70,7 @@ int KernelSem::wait(Time maxTimeToWait){
 		return 1;
 	}
 
-	return maxTimeToWait; //if maxTimeToWait < 0, not gonna happend?
+	return maxTimeToWait; //if maxTimeToWait < 0, not gonna happen?
 }
 
 int KernelSem::waitWithTime(Time maxTimeToWait){

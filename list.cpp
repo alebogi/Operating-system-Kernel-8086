@@ -48,7 +48,7 @@ int List::isEmpty(){
 
 
  /**
-  * Adds element in queue in FIFO order (push back)
+  * Adds element in list in FIFO order (push back)
   */
  void List::push(KernelSem* s){
 	 lock();
@@ -65,7 +65,7 @@ int List::isEmpty(){
  }
 
  /**
-  * Returns element from queue in FIFO order (pop front) and removes it from queue.
+  * Returns element from queue in FIFO order (pop head) and removes it from list.
   */
  KernelSem* List::pop(){
 	 lock();
