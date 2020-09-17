@@ -143,6 +143,11 @@ int KernelSem::signal(int n){
 void KernelSem::signalTick(){
 	lock();
 
+	if(System::allSemsInSystem == 0){
+		unlock();
+		return;
+	}
+
 	PCB* tryToDeblock;
 	KernelSem* tempSem;
 	int sizeOfQueuePCBs;
