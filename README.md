@@ -7,6 +7,8 @@ Concepts: PCB, Threads, Interrupts, Semaphores, Events
 
 Works on 32-bit machine using a bcc 3.1 compiler.
 
+For more details - there is a pdf file in Serbian language.
+
 ### Built with
 - C++
 
